@@ -1,6 +1,6 @@
 
 # Snoopdog 
-Snoopdog is a framework to detect is there is a bug spying on us. For reference, check out Singh et al., «I Always Feel Like Somebody’s Sensing Me! A Framework to Detect, Identify, and Localize Clandestine Wireless Sensors».
+Snoopdog is a framework to detect if there is a bug spying on us. For reference, check out Singh et al., «I Always Feel Like Somebody’s Sensing Me! A Framework to Detect, Identify, and Localize Clandestine Wireless Sensors».
 
 In this repository there is a simple python implementation; it only checks if there is a camera sniffing the wifi. The ground sensor is another camera (e.g. laptop camera) to detect if the user is moving. 
 
