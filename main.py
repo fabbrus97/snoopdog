@@ -2,6 +2,7 @@ from threading import Thread
 from statsmodels.tsa.stattools import grangercausalitytests
 import pyshark
 import pandas as pd
+import math
 import datetime
 import subprocess
 import json
@@ -77,6 +78,42 @@ class RecordVideo(Thread):
         self.FILENAME = "/tmp/snoopdog.mp4"
     
     def run(self):
+        raw = []
+        readings = []
+        start = datetime.now()
+        while True:
+            cmdout = subprocess.run(command.split(" "), capture_output=True)
+            raw.append(cmdout.stdout)
+            now = datetime.now()
+
+            if (now - start).seconds > TIMEOUT:
+                break
+
+        for r in raw:
+            accel_per_sec = 0
+            sec = -1
+            r_counter = 0
+            for line in r.decode('ascii').split('\n'):
+                if line.startswith("ts"):
+                    r_counter += 1
+                    l = line.split(",")
+                    if sec == -1:
+                        sec = int(float(l[0].replace("ts=", "")))
+                    
+                    _s = int(float(l[0].replace("ts=", "")))
+                    if _s != sec:
+                        readings.append(accel_per_sec/r_counter)
+                        r_counter = 0
+                        accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
+                        sec = _s
+                    else:
+                        accel_per_sec += math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
+
+        self.frames = readings
+
+        print("Thread ", self.name, " terminated 📹⚪")
+
+        """
         print ("Thread '" + self.name + "' started 📹🔴")
         command = f"ffmpeg -y -t {TIMEOUT} -i {self.camera} -vcodec h264 {self.FILENAME} -pix_fmt yuv420p -f sdl 'snoopdog'"
         
@@ -99,6 +136,7 @@ class RecordVideo(Thread):
         self.frames = list(sizes.values())
 
         print("Thread ", self.name, " terminated 📹⚪")
+        """
 
 if len(sys.argv) < 2:
     print("Wrong number of argumens!")
