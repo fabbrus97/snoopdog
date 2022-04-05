@@ -7,16 +7,18 @@ from matplotlib import pyplot as plt
 TIMEOUT = 20
 folder = "/sdcard/snoopdogg/" 
 out_file = f"{folder}accel.out"
+runscript_name = "run_android.sh"
 script_name = "android.sh"
 
 cmd_mkdir = f"adb shell mkdir {folder}"                      #create working directory on device
 cmd_rm = f"adb shell rm {out_file}"                          #delete output file on device
 cmd_push = f"adb push {script_name} {folder}"                #load script on device
-cmd_script = f"adb shell sh {folder}{script_name} & echo $!" #launch script and print pid on device
+cmd_run_push = f"adb push {runscript_name} {folder}"                #load script on device
+cmd_script = f"adb shell sh {folder}{script_name}" #launch script and print pid on device
 cmd_dl = f"adb pull {out_file}"                              #download output file
 cmd_polish = f"sed 's/.*(//g' accel.out | sed 's/)/,/g'"     #clean the output file
 
-setup_cmd = [cmd_mkdir, cmd_rm, cmd_push]
+setup_cmd = [cmd_mkdir, cmd_rm, cmd_push, cmd_run_push]
 
 def setup():
     for cmd in setup_cmd:
