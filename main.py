@@ -204,11 +204,10 @@ for packets in sniffed_channels:
                 break
             j += 1
         
-
-        for i in range(j, j+TIMEOUT):
-            a_data.append(list(accel_data[i].values())[0])
-        
         packet_data = packets[s]["bytes_per_seconds"]
+
+        for i in range(j, j+len(packet_data)):
+            a_data.append(list(accel_data[i].values())[0])
 
         d = {'frame': a_data, 'packet': packet_data}
         print("DEBUG LUNGHEZZE")
