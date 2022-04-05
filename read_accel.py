@@ -42,6 +42,8 @@ def get_data():
     data = file.readlines()
     file.close()
 
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
 
     readings_ts = []
     accel_per_sec = 0
@@ -56,9 +58,9 @@ def get_data():
             
             _s = int(float(l[0].replace("ts=", "")))
             if _s != sec:
-                # ts = l[1].replace(" wall=", "") ; ts = ts[ts.find("."):len(ts)]
-                # d = {} ; d[ts] = accel_per_sec/r_counter
-                d = {} ; d[sec] = accel_per_sec/r_counter
+                ts = l[1].replace(" wall=", "") ; ts = ts[:ts.find(".")]
+                ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
+                d = {} ; d[ts] = accel_per_sec/r_counter
                 readings_ts.append(d)
 
                 r_counter = 0
