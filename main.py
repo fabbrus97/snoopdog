@@ -204,7 +204,12 @@ for channel in sniffed_channels:
         
         packet_data = channel[device]["bytes_per_seconds"]
 
+        print("DEBUG:")
+        print("j:", j)
+        print("len(packet_data):", len(packet_data))
+        print("len(accel_data):", len(packet_data))
         for i in range(j, j+len(packet_data)):
+            print("accel_data[i].values():", accel_data[i].values())
             a_data.append(list(accel_data[i].values())[0])
 
         d = {'frame': a_data, 'packet': packet_data}
