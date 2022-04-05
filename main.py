@@ -189,12 +189,15 @@ read_accel.connect2device(device) #reconnect to android device
 read_accel.killscript() # stop the script 
 accel_data = read_accel.get_data() #collect the data
 
+print("DEBUG PACKETS")
+print(sniffed_channels)
 
 for packets in sniffed_channels:
     a_data = []
     packet_data = []
     for s in packets:
         
+        print("DEBUG timestamp 1:", packets[s]["time"])
         timestamp = packets[s]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
         print("DEBUG TIMESTAMP:", timestamp) #TODO debug
         j = 0 #index for accel data

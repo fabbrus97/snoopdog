@@ -53,13 +53,20 @@ def get_data():
         if line.startswith("ts"):
             r_counter += 1
             l = line.split(",")
-            if sec == -1:
-                sec = int(float(l[0].replace("ts=", "")))
             
-            _s = int(float(l[0].replace("ts=", "")))
-            if _s < sec: #condition is needed because if there is no new data, accel sensors gives old data
+            ts = l[1].replace(" wall=", "") ; ts = ts[:ts.find(".")]
+            ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
+
+            if sec == -1:
+                # sec = int(float(l[0].replace("ts=", "")))
+                sec = ts
+            
+            #_s = int(float(l[0].replace("ts=", "")))
+            
+            if ts < sec: #condition is needed because if there is no new data, accel sensors gives old data
                 continue
-            if _s != sec: 
+            if ts != sec: 
+                print("DEBUG letto nuovo secondo! il vecchio è", sec)
                 ts = l[1].replace(" wall=", "") ; ts = ts[:ts.find(".")]
                 ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
                 d = {} ; d[ts] = accel_per_sec/r_counter
@@ -67,7 +74,7 @@ def get_data():
 
                 r_counter = 0
                 accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
-                sec = _s
+                sec = ts
             else:
                 accel_per_sec += math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
 
