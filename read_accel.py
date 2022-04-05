@@ -30,9 +30,12 @@ def runscript():
 
 def killscript(pid):
     cmd_kill = f"adb shell kill {pid}"
+    subprocess.run(cmd_kill.split(" "))
+
 
 def connect2device(ip):
     cmd_connect = f"adb connect {ip}"
+    subprocess.run(cmd_connect.split(" "))
 
 def get_data():
     subprocess.run(cmd_dl.split(" "))
