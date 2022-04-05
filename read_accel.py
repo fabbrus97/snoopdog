@@ -23,7 +23,7 @@ def setup():
         subprocess.run(cmd.split(" "))
 
 def runscript():
-    cmdout = subprocess.run(cmd_script.split(" "), capture_output=True)
+    cmdout = subprocess.Popen(cmd_script.split(" "), capture_output=True)
     cmdout = cmdout.decode("ascii") #script pid
     print("Started process", cmdout, "on device")
     return cmdout 

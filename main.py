@@ -141,16 +141,16 @@ card  = sys.argv[1]
 device = sys.argv[2]
 
 command = f"./list_channels.sh {card}"
-channels = subprocess.run(command.split(" "), capture_output=True)
+#channels = subprocess.run(command.split(" "), capture_output=True) TODO
 
 
-channels = str(channels.stdout)
+# channels = str(channels.stdout)
 
-channels = channels.split("\\n"); channels = channels[0:-1]
+# channels = channels.split("\\n"); channels = channels[0:-1]
 
-channels[0] = channels[0][ (len(channels[0])-1) : len(channels[0]) ]
+# channels[0] = channels[0][ (len(channels[0])-1) : len(channels[0]) ]
 
-print(f"{len(channels)} channels found!")
+# print(f"{len(channels)} channels found!")
 
 channels = [36] #TODO 
 
