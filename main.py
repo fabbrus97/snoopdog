@@ -11,7 +11,7 @@ import time
 from matplotlib import pyplot as plt
 
 
-TIMEOUT = 50 #seconds to capture/record video #TODO 50
+TIMEOUT = 15 #seconds to capture/record video #TODO 50
 
 def sniff(interface):
     print ("Sniff started 👃🔴")
