@@ -16,10 +16,10 @@ cmd_script = f"adb shell sh {folder}{script_name} & echo $!" #launch script and 
 cmd_dl = f"adb pull {out_file}"                              #download output file
 cmd_polish = f"sed 's/.*(//g' accel.out | sed 's/)/,/g'"     #clean the output file
 
-setup = [cmd_mkdir, cmd_rm, cmd_push]
+setup_cmd = [cmd_mkdir, cmd_rm, cmd_push]
 
 def setup():
-    for cmd in setup:
+    for cmd in setup_cmd:
         subprocess.run(cmd.split(" "))
 
 def runscript():
