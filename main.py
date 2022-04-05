@@ -210,11 +210,11 @@ for channel in sniffed_channels:
         else:
             continue #not enough data
         
-        dev_plt = plt.plot(range(len(packet_data)), packet_data)
-        dev_plt.savefig(spy_device + ".png")
+        plt.plot(range(len(packet_data)), packet_data)
+        plt.savefig(spy_device + ".png")
 
-        dev_acc_plt = plt.plot(range(len(a_data)), a_data)
-        dev_acc_plt.savefig(spy_device + "_accel.png")
+        plt.plot(range(len(a_data)), a_data)
+        plt.savefig(spy_device + "_accel.png")
 
         d = {'frame': a_data, 'packet': packet_data}
         df = pd.DataFrame(data=d)
