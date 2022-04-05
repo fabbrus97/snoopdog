@@ -18,14 +18,16 @@ def sniff(interface):
     output_file = "/tmp/mycapture.pcap"
     command = f"sudo tshark -i {interface} -a duration:{TIMEOUT} -F pcap -w {output_file}" 
     subprocess.run(command.split(" "))
+    
+    print("Sniff terminated 👃⚪")
+    print("Elaborating data (may take some time)...")
+    
     capture = pyshark.FileCapture(output_file)
     capture.load_packets()
     
     sources = {}
     start_time = int(float(capture[0].sniff_timestamp))
 
-    print("Sniff terminated 👃⚪")
-    print("Elaborating data...")
     i = 0
     for frame in capture:
         print(i, "/", len(capture), end="\r")
