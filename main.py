@@ -11,7 +11,7 @@ import time
 from matplotlib import pyplot as plt
 
 
-TIMEOUT = 50 #seconds to capture/record video #TODO 50
+TIMEOUT = 50 #seconds to capture/record video
 
 def sniff(interface):
     print ("Sniff started 👃🔴")
@@ -67,76 +67,6 @@ def sniff(interface):
     
     return sources
     
-
-class RecordVideo(Thread):
-    def __init__(self, name, camera):
-        Thread.__init__(self)
-        self.name = name
-        self.camera = camera
-        self.frames = []
-        self.FILENAME = "/tmp/snoopdog.mp4"
-    
-    def run(self):
-        raw = []
-        readings = []
-        start = datetime.now()
-        while True:
-            cmdout = subprocess.run(command.split(" "), capture_output=True)
-            raw.append(cmdout.stdout)
-            now = datetime.now()
-
-            if (now - start).seconds > TIMEOUT:
-                break
-
-        for r in raw:
-            accel_per_sec = 0
-            sec = -1
-            r_counter = 0
-            for line in r.decode('ascii').split('\n'):
-                if line.startswith("ts"):
-                    r_counter += 1
-                    l = line.split(",")
-                    if sec == -1:
-                        sec = int(float(l[0].replace("ts=", "")))
-                    
-                    _s = int(float(l[0].replace("ts=", "")))
-                    if _s != sec:
-                        readings.append(accel_per_sec/r_counter)
-                        r_counter = 0
-                        accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
-                        sec = _s
-                    else:
-                        accel_per_sec += math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
-
-        self.frames = readings
-
-        print("Thread ", self.name, " terminated 📹⚪")
-
-        """
-        print ("Thread '" + self.name + "' started 📹🔴")
-        command = f"ffmpeg -y -t {TIMEOUT} -i {self.camera} -vcodec h264 {self.FILENAME} -pix_fmt yuv420p -f sdl 'snoopdog'"
-        
-        subprocess.run(command.split(" "), capture_output=True)
-
-
-        command = f"ffprobe -show_frames -print_format json {self.FILENAME}"
-        cmdout = subprocess.run(command.split(" "), capture_output=True)
-
-        frames = json.loads(cmdout.stdout) 
-
-        sizes = {}
-
-        for frame in frames["frames"]:
-            ts = int(float(frame["best_effort_timestamp_time"]))
-            if not sizes.get(ts):
-                sizes[ts] = 0
-            sizes[ts] += int(frame["pkt_size"])
-
-        self.frames = list(sizes.values())
-
-        print("Thread ", self.name, " terminated 📹⚪")
-        """
-
 if len(sys.argv) < 2:
     print("Wrong number of argumens!")
     print(f"Usage: {sys.argv[0]} network_card device")
@@ -147,18 +77,15 @@ card  = sys.argv[1]
 device = sys.argv[2]
 
 command = f"./list_channels.sh {card}"
-#channels = subprocess.run(command.split(" "), capture_output=True) TODO
+channels = subprocess.run(command.split(" "), capture_output=True) 
 
+channels = str(channels.stdout) 
 
-# channels = str(channels.stdout) TODO
+channels = channels.split("\\n"); channels = channels[0:-1]
 
-# channels = channels.split("\\n"); channels = channels[0:-1]
+channels[0] = channels[0][ (len(channels[0])-1) : len(channels[0]) ]
 
-# channels[0] = channels[0][ (len(channels[0])-1) : len(channels[0]) ]
-
-# print(f"{len(channels)} channels found!")
-
-channels = [36] #TODO 
+print(f"{len(channels)} channels found!")
 
 read_accel.connect2device(device)
 read_accel.setup()
