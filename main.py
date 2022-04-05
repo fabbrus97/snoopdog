@@ -8,6 +8,7 @@ import subprocess
 import sys
 import read_accel
 import time
+from matplotlib import pyplot as plt
 
 
 TIMEOUT = 50 #seconds to capture/record video #TODO 50
@@ -192,36 +193,37 @@ accel_data = read_accel.get_data() #collect the data
 
 
 for channel in sniffed_channels:
-    for device in channel:
+    for spy_device in channel:
         a_data = []
-        print("DEBUG timestamp 1:", channel[device]["time"])
-        timestamp = channel[device]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
-        print("DEBUG TIMESTAMP:", timestamp) #TODO debug
+        timestamp = channel[spy_device]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
         j = 0 #index for accel data
         for a in accel_data:
             if a.get(timestamp):
                 break
             j += 1
         
-        packet_data = channel[device]["bytes_per_seconds"]
+        packet_data = channel[spy_device]["bytes_per_seconds"]
 
         if j+len(packet_data) < len(accel_data):
             for i in range(j, j+len(packet_data)):
                 a_data.append(list(accel_data[i].values())[0])
         else:
             continue #not enough data
+        
+        plt.plot(packet_data, range(len(packet_data)))
+        plt.savefig(spy_device + ".png")
+
+        plt.plot(a_data, range(len(a_data)))
+        plt.savefig(spy_device + "_accel.png")
 
         d = {'frame': a_data, 'packet': packet_data}
-        print("DEBUG LUNGHEZZE")
-        print(len(a_data))  #debug
-        print(len(packet_data))
         df = pd.DataFrame(data=d)
         try:
             gtests = grangercausalitytests(df[['frame', 'packet']], maxlag=5, verbose=False)
             #lag = 1
             for lag in gtests:
                 if (gtests[lag][0]["ssr_ftest"][1] < 0.08):
-                    print(f"👀👀 Is spying! (lag{lag}, device: {device})")
+                    print(f"👀👀 Is spying! (lag{lag}, device: {spy_device})")
                     
         except Exception as e:
             
