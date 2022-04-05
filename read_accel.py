@@ -57,7 +57,9 @@ def get_data():
                 sec = int(float(l[0].replace("ts=", "")))
             
             _s = int(float(l[0].replace("ts=", "")))
-            if _s != sec:
+            if _s < sec: #condition is needed because if there is no new data, accel sensors gives old data
+                continue
+            if _s != sec: 
                 ts = l[1].replace(" wall=", "") ; ts = ts[:ts.find(".")]
                 ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
                 d = {} ; d[ts] = accel_per_sec/r_counter
@@ -67,7 +69,6 @@ def get_data():
                 accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
                 sec = _s
             else:
-                print(l) #DEBUG 
                 accel_per_sec += math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
 
     return readings_ts
