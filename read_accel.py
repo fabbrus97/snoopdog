@@ -64,6 +64,7 @@ def get_data():
                 accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
                 sec = _s
             else:
+                print(l) #DEBUG 
                 accel_per_sec += math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
 
     return readings_ts
