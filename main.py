@@ -189,6 +189,8 @@ read_accel.connect2device(device) #reconnect to android device
 read_accel.killscript() # stop the script 
 accel_data = read_accel.get_data() #collect the data
 
+print("DEBUG accel_data")
+print(accel_data)
 
 for packets in sniffed_channels:
     a_data = []

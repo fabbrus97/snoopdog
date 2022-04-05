@@ -71,8 +71,8 @@ def get_data():
                 # ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
                 d = {} ; d[ts] = accel_per_sec/r_counter
                 readings_ts.append(d)
-                print("DEBUG Ora reading_ts è")
-                print(readings_ts)
+                print("DEBUG Ora reading_ts è lungo", len(readings_ts))
+                
 
                 r_counter = 0
                 accel_per_sec = math.sqrt(float(l[2])**2 + float(l[3])**2 + float(l[4])**2)
