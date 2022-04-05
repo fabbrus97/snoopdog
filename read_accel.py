@@ -23,13 +23,11 @@ def setup():
         subprocess.run(cmd.split(" "))
 
 def runscript():
-    cmdout = subprocess.Popen(cmd_script.split(" "), capture_output=True)
-    cmdout = cmdout.decode("ascii") #script pid
-    print("Started process", cmdout, "on device")
-    return cmdout 
+    subprocess.Popen(cmd_script.split(" "))
+    print("Started process on device")
 
-def killscript(pid):
-    cmd_kill = f"adb shell kill {pid}"
+def killscript():
+    cmd_kill = f"adb shell kill `cat {folder}pid`"
     subprocess.run(cmd_kill.split(" "))
 
 

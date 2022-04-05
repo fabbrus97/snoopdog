@@ -156,7 +156,7 @@ channels = [36] #TODO
 
 read_accel.connect2device(device)
 read_accel.setup()
-pid = read_accel.runscript()
+read_accel.runscript()
 
 sniffed_channels = []
 
@@ -177,7 +177,7 @@ for channel in channels:
     
     input("\nPress enter to continue")
 
-read_accel.killscript(pid)
+read_accel.killscript()
 accel_data = read_accel.get_data()
 
 for packets in sniffed_channels:
