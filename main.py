@@ -192,7 +192,7 @@ for packets in sniffed_channels:
     a_data = []
     packet_data = []
     for s in packets:
-        
+        print(s) #DEBUG
         i = 0
         timestamp = s["time"]
         j = 0 #index for accel data
