@@ -7,6 +7,7 @@ import datetime
 import subprocess
 import sys
 import read_accel
+import time
 
 
 TIMEOUT = 50 #seconds to capture/record video
@@ -177,11 +178,12 @@ for channel in channels:
     
     input("\nPress enter to continue")
 
-command = f"airmon-ng stop {card}"
+command = f"airmon-ng stop {card}" #stop the capture and reconnect to wifi
 subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
-
-read_accel.killscript()
-accel_data = read_accel.get_data()
+time.sleep(10) ; #some time is needed to reconnect to the network
+read_accel.connect2device(device) #reconnect to android device
+read_accel.killscript() # stop the script 
+accel_data = read_accel.get_data() #collect the data
 
 for packets in sniffed_channels:
     a_data = []
