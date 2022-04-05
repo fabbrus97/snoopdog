@@ -194,7 +194,7 @@ for packets in sniffed_channels:
     for s in packets:
         
         i = 0
-        timestamp = sniff.packets[s]["time"]
+        timestamp = s["time"]
         j = 0 #index for accel data
         for a in accel_data:
             if accel_data.get(timestamp):
@@ -205,7 +205,7 @@ for packets in sniffed_channels:
         for i in range(j, TIMEOUT):
             a_data.append(list(accel_data[i].values())[0])
         
-        packet_data = sniff.packets[s]["bytes_per_seconds"]
+        packet_data = s["bytes_per_seconds"]
 
         d = {'frame': a_data, 'packet': packet_data}
         df = pd.DataFrame(data=d)
