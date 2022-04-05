@@ -195,7 +195,7 @@ for packets in sniffed_channels:
     packet_data = []
     for s in packets:
         
-        timestamp = packets[s]["time"]
+        timestamp = packets[s]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
         print("DEBUG TIMESTAMP:", timestamp) #TODO debug
         j = 0 #index for accel data
         for a in accel_data:
