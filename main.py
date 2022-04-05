@@ -196,7 +196,7 @@ for packets in sniffed_channels:
         timestamp = packets[s]["time"]
         j = 0 #index for accel data
         for a in accel_data:
-            if accel_data.get(timestamp):
+            if a.get(timestamp):
                 break
             j += 1
         
