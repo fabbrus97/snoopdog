@@ -176,7 +176,7 @@ for channel in channels:
 
     sniffed_channels.append(sniff_data)
     
-    input("\nPress any key to continue")
+    input("\nPress enter to continue")
 
 print("Wireless data collected; stopping the capture...")
 command = f"airmon-ng stop {card}" #stop the capture and reconnect to wifi
@@ -192,7 +192,6 @@ for packets in sniffed_channels:
     a_data = []
     packet_data = []
     for s in packets:
-        print(packets[s]) #DEBUG
         i = 0
         timestamp = packets[s]["time"]
         j = 0 #index for accel data

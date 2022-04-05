@@ -10,13 +10,13 @@ out_file = f"{folder}accel.out"
 runscript_name = "run_android.sh"
 script_name = "android.sh"
 
-cmd_mkdir = f"adb shell mkdir {folder}"                      #create working directory on device
-cmd_rm = f"adb shell rm {out_file}"                          #delete output file on device
-cmd_push = f"adb push {script_name} {folder}"                #load script on device
-cmd_run_push = f"adb push {runscript_name} {folder}"                #load script on device
-cmd_script = f"adb shell sh {folder}{runscript_name}" #launch script and print pid on device
-cmd_dl = f"adb pull {out_file}"                              #download output file
-cmd_polish = f"sed 's/.*(//g' accel.out | sed 's/)/,/g'"     #clean the output file
+cmd_mkdir = f"adb shell mkdir {folder}"                                                           #create working directory on device
+cmd_rm = f"adb shell rm {out_file}"                                                               #delete output file on device
+cmd_push = f"adb push {script_name} {folder}"                                                     #load script 2 on device
+cmd_run_push = f"adb push {runscript_name} {folder}"                                              #load script 1 on device
+cmd_script = f"adb shell sh {folder}{runscript_name}"                                             #launch script and print pid on device
+cmd_dl = f"adb pull {out_file} accel.raw"                                                         #download output file
+cmd_polish = ["sed",  r"s/.*(//g", "accel.raw", "|", "sed", r"s/)/,/g", "|", "tee", "accel.out"]  #clean the output file
 
 setup_cmd = [cmd_mkdir, cmd_rm, cmd_push, cmd_run_push]
 
@@ -39,7 +39,7 @@ def connect2device(ip):
 
 def get_data():
     subprocess.run(cmd_dl.split(" "))
-    subprocess.run(cmd_polish.split(" "))
+    subprocess.run(cmd_polish)
     file = open("accel.out")
     data = file.readlines()
     file.close()
