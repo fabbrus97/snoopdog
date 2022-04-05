@@ -10,7 +10,7 @@ import read_accel
 import time
 
 
-TIMEOUT = 50 #seconds to capture/record video
+TIMEOUT = 15 #seconds to capture/record video
 
 def sniff(interface):
     print ("Sniff started 👃🔴")
@@ -178,9 +178,12 @@ for channel in channels:
     
     input("\nPress enter to continue")
 
+print("Wireless data collected; stopping the capture...")
 command = f"airmon-ng stop {card}" #stop the capture and reconnect to wifi
 subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
+print("Riconnecting to the network...")
 time.sleep(10) ; #some time is needed to reconnect to the network
+print("Collecting ground sensor data...")
 read_accel.connect2device(device) #reconnect to android device
 read_accel.killscript() # stop the script 
 accel_data = read_accel.get_data() #collect the data
