@@ -207,6 +207,9 @@ for packets in sniffed_channels:
         packet_data = packets[s]["bytes_per_seconds"]
 
         d = {'frame': a_data, 'packet': packet_data}
+        print("DEBUG LUNGHEZZE")
+        print(len(a_data))  #debug
+        print(len(packet_data))
         df = pd.DataFrame(data=d)
         try:
             gtests = grangercausalitytests(df[['frame', 'packet']], maxlag=5, verbose=False)
