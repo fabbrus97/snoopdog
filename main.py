@@ -5,69 +5,62 @@ import pandas as pd
 import math
 import datetime
 import subprocess
-import json
 import sys
+import read_accel
 
 
 TIMEOUT = 50 #seconds to capture/record video
 
-class Sniff(Thread):
-    def __init__(self, name, interface):
-        Thread.__init__(self)
-        self.name = name
-        self.interface = interface
-        self.packets = {}
+def sniff(interface):
+    print ("Sniff started 👃🔴")
+
+    output_file = "/tmp/mycapture.pcap"
+    command = f"sudo tshark -i {interface} -a duration:{TIMEOUT} -F pcap -w {output_file}" 
+    subprocess.run(command.split(" "))
+    capture = pyshark.FileCapture(output_file)
+    capture.load_packets()
     
-    def run(self):
-        print ("Thread '" + self.name + "' started 👃🔴")
-        
-        output_file = "/tmp/mycapture.pcap"
-        command = f"sudo tshark -i {self.interface} -a duration:{TIMEOUT} -F pcap -w {output_file}" 
-        subprocess.run(command.split(" "))
-        capture = pyshark.FileCapture(output_file)
-        capture.load_packets()
-        
-        sources = {}
-        start_time = int(float(capture[0].sniff_timestamp))
+    sources = {}
+    start_time = int(float(capture[0].sniff_timestamp))
 
-        i = 0
-        for frame in capture:
-            print(i, "/", len(capture), end="\r")
-            i += 1
-            try:
-                sa = frame.wlan.get("sa")
-                if not sa: #some packets do not have 'sa' field but 'ta' for reasons?
-                    sa = frame.wlan.get("ta")
-                    if not sa:
-                        continue #we don't have a valid source address
-                fl = int(frame.length)
-                _time = int(float(frame.sniff_timestamp))
+    i = 0
+    for frame in capture:
+        print(i, "/", len(capture), end="\r")
+        i += 1
+        try:
+            sa = frame.wlan.get("sa")
+            if not sa: #some packets do not have 'sa' field but 'ta' for reasons?
+                sa = frame.wlan.get("ta")
+                if not sa:
+                    continue #we don't have a valid source address
+            fl = int(frame.length)
+            _time = int(float(frame.sniff_timestamp))
 
-                if sources.get(sa): #source address
-                    if _time - sources[sa]["time"] == 0:
+            if sources.get(sa): #source address
+                if _time - sources[sa]["time"] == 0:
 
-                        sources[sa]["bytes_per_seconds"][sources[sa]["time"] - start_time] += fl
-                    elif _time - sources[sa]["time"] == 1:
-                        sources[sa]["time"] = _time
-                        sources[sa]["bytes_per_seconds"].append(fl)
-                    else: 
-                        for i in range(sources[sa]["time"], _time):
-                            sources[sa]["bytes_per_seconds"].append(0)
-                        sources[sa]["time"] = _time
-                        sources[sa]["bytes_per_seconds"].append(fl)
-                
-                else:
-                    sources[sa] = {
-                        "bytes_per_seconds": [int(frame.length)],
-                        "time": int(float(capture[0].sniff_timestamp))
-                        }
-            except Exception as e:
-                pass
+                    sources[sa]["bytes_per_seconds"][sources[sa]["time"] - start_time] += fl
+                elif _time - sources[sa]["time"] == 1:
+                    sources[sa]["time"] = _time
+                    sources[sa]["bytes_per_seconds"].append(fl)
+                else: 
+                    for i in range(sources[sa]["time"], _time):
+                        sources[sa]["bytes_per_seconds"].append(0)
+                    sources[sa]["time"] = _time
+                    sources[sa]["bytes_per_seconds"].append(fl)
             
-            
-        self.packets = sources
-        print("Thread ", self.name, " terminated 👃⚪")
-
+            else:
+                sources[sa] = {
+                    "bytes_per_seconds": [int(frame.length)],
+                    "time": int(float(capture[0].sniff_timestamp))
+                    }
+        except Exception as e:
+            pass
+        
+        
+    print("Sniff terminated 👃⚪")
+    return sources
+    
 
 class RecordVideo(Thread):
     def __init__(self, name, camera):
@@ -140,12 +133,12 @@ class RecordVideo(Thread):
 
 if len(sys.argv) < 2:
     print("Wrong number of argumens!")
-    print(f"Usage: {sys.argv[0]} network_card video_device")
-    print(f"e.g.: {sys.argv[0]} eth0 /dev/video0")
+    print(f"Usage: {sys.argv[0]} network_card device")
+    print(f"e.g.: {sys.argv[0]} eth0 192.168.1.2:5555")
     sys.exit(1)
 
 card  = sys.argv[1]
-video = sys.argv[2]
+device = sys.argv[2]
 
 command = f"./list_channels.sh {card}"
 channels = subprocess.run(command.split(" "), capture_output=True)
@@ -161,8 +154,15 @@ print(f"{len(channels)} channels found!")
 
 channels = [36] #TODO 
 
+read_accel.connect2device(device)
+read_accel.setup()
+pid = read_accel.runscript()
+
+sniffed_channels = []
+
 for channel in channels:
     print("🔍 Start monitoring on channel", channel)
+    #now we lose connection to the device
     command = f"airmon-ng start {card} {channel}"
 
     if not card.endswith("mon"):
@@ -170,19 +170,36 @@ for channel in channels:
     
     subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
 
-    rv = RecordVideo("record_video", video)
-    sniff = Sniff("sniff", card)
+    #rv = RecordVideo("record_video", video)
+    sniff_data = sniff(card)
 
-    rv.start(); sniff.start(); sniff.join(); rv.join()
+    sniffed_channels.append(sniff_data)
+    
+    input("\nPress enter to continue")
 
-    for s in sniff.packets:
-        packet_data = []
+read_accel.killscript(pid)
+accel_data = read_accel.get_data()
+
+for packets in sniffed_channels:
+    a_data = []
+    packet_data = []
+    for s in packets:
+        
         i = 0
-        while i < len(rv.frames) and i < len(sniff.packets[s]["bytes_per_seconds"]):
-            packet_data.append(sniff.packets[s]["bytes_per_seconds"][i])
-            i += 1
+        timestamp = sniff.packets[s]["time"]
+        j = 0 #index for accel data
+        for a in accel_data:
+            if accel_data.get(timestamp):
+                break
+            j += 1
+        
 
-        d = {'frame': rv.frames[0:i], 'packet': packet_data}
+        for i in range(j, TIMEOUT):
+            a_data.append(list(accel_data[i].values())[0])
+        
+        packet_data = sniff.packets[s]["bytes_per_seconds"]
+
+        d = {'frame': a_data, 'packet': packet_data}
         df = pd.DataFrame(data=d)
         try:
             gtests = grangercausalitytests(df[['frame', 'packet']], maxlag=5, verbose=False)
@@ -194,8 +211,7 @@ for channel in channels:
         except Exception as e:
             
             pass
-    
-    input("\nPress enter to continue")
+
 
 command = f"airmon-ng stop {card}"
 subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
