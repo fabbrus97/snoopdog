@@ -177,6 +177,9 @@ for channel in channels:
     
     input("\nPress enter to continue")
 
+command = f"airmon-ng stop {card}"
+subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
+
 read_accel.killscript()
 accel_data = read_accel.get_data()
 
@@ -212,6 +215,3 @@ for packets in sniffed_channels:
             
             pass
 
-
-command = f"airmon-ng stop {card}"
-subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)
