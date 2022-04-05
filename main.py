@@ -169,19 +169,18 @@ for channel in channels:
     if not card.endswith("mon"):
         card += "mon"
     
-    # subprocess.run(command.split(" "), stdout=subprocess.DEVNULL) TODO 
+    subprocess.run(command.split(" "), stdout=subprocess.DEVNULL)  
 
-    # sniff_data = sniff(card) TODO 
+    sniff_data = sniff(card) 
 
-    # sniffed_channels.append(sniff_data) TODO
-    time.sleep(10) #TODO 
+    sniffed_channels.append(sniff_data) 
     input("\nPress enter twice to continue")
 
 print("Wireless data collected; stopping the capture...")
 command = f"airmon-ng stop {card}" #stop the capture and reconnect to wifi
-# subprocess.run(command.split(" "), stdout=subprocess.DEVNULL) TODO
+subprocess.run(command.split(" "), stdout=subprocess.DEVNULL) 
 print("Riconnecting to the network...")
-time.sleep(10) ; #some time is needed to reconnect to the network
+time.sleep(5) ; #some time is needed to reconnect to the network
 print("Collecting ground sensor data...")
 read_accel.connect2device(device) #reconnect to android device
 read_accel.killscript() # stop the script 
@@ -196,6 +195,7 @@ for packets in sniffed_channels:
     for s in packets:
         i = 0
         timestamp = packets[s]["time"]
+        print("DEBUG TIMESTAMP:", timestamp) #TODO debug
         j = 0 #index for accel data
         for a in accel_data:
             if a.get(timestamp):
