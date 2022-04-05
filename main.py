@@ -10,7 +10,7 @@ import read_accel
 import time
 
 
-TIMEOUT = 10 #seconds to capture/record video #TODO 50
+TIMEOUT = 50 #seconds to capture/record video #TODO 50
 
 def sniff(interface):
     print ("Sniff started 👃🔴")
