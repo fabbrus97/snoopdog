@@ -24,9 +24,8 @@ def sniff(interface):
     sources = {}
     start_time = int(float(capture[0].sniff_timestamp))
 
-    print("TIMESTAMP DEBUG START", capture[0].sniff_timestamp) #todo
-    print("TIMESTAMP DEBUG END", capture[len(capture)-1].sniff_timestamp)
-
+    print("Sniff terminated 👃⚪")
+    print("Elaborating data...")
     i = 0
     for frame in capture:
         print(i, "/", len(capture), end="\r")
@@ -62,7 +61,7 @@ def sniff(interface):
             pass
         
         
-    print("Sniff terminated 👃⚪")
+    
     return sources
     
 
