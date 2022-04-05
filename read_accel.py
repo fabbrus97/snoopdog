@@ -66,12 +66,10 @@ def get_data():
             if ts < sec: #condition is needed because if there is no new data, accel sensors gives old data
                 continue
             elif ts > sec: 
-                print("DEBUG letto nuovo secondo! il vecchio è", sec)
                 # ts = l[1].replace(" wall=", "") ; ts = ts[:ts.find(".")]
                 # ts = int(datetime.fromisoformat(f"{today}T{ts}").timestamp()) #format 2022-04-02T11:12:13 to unix epoch timestamp
                 d = {} ; d[ts] = accel_per_sec/r_counter
                 readings_ts.append(d)
-                print("DEBUG Ora reading_ts è lungo", len(readings_ts))
                 
 
                 r_counter = 0
