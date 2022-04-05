@@ -189,8 +189,6 @@ read_accel.connect2device(device) #reconnect to android device
 read_accel.killscript() # stop the script 
 accel_data = read_accel.get_data() #collect the data
 
-print("DEBUG accel_data")
-print(accel_data)
 
 for packets in sniffed_channels:
     a_data = []
@@ -202,13 +200,12 @@ for packets in sniffed_channels:
         print("DEBUG TIMESTAMP:", timestamp) #TODO debug
         j = 0 #index for accel data
         for a in accel_data:
-            print(a)
             if a.get(timestamp):
                 break
             j += 1
         
 
-        for i in range(j, TIMEOUT):
+        for i in range(j, j+TIMEOUT):
             a_data.append(list(accel_data[i].values())[0])
         
         packet_data = packets[s]["bytes_per_seconds"]
