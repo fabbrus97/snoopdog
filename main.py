@@ -190,13 +190,11 @@ read_accel.killscript() # stop the script
 accel_data = read_accel.get_data() #collect the data
 
 
-for packets in sniffed_channels:
-    a_data = []
-    packet_data = []
-    for s in packets:
-        
-        print("DEBUG timestamp 1:", packets[s]["time"])
-        timestamp = packets[s]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
+for channel in sniffed_channels:
+    for device in channel:
+        a_data = []
+        print("DEBUG timestamp 1:", channel[device]["time"])
+        timestamp = channel[device]["time"] - TIMEOUT #this is needed since timestamp corresponds to the last timestamp, we need the first
         print("DEBUG TIMESTAMP:", timestamp) #TODO debug
         j = 0 #index for accel data
         for a in accel_data:
@@ -204,7 +202,7 @@ for packets in sniffed_channels:
                 break
             j += 1
         
-        packet_data = packets[s]["bytes_per_seconds"]
+        packet_data = channel[device]["bytes_per_seconds"]
 
         for i in range(j, j+len(packet_data)):
             a_data.append(list(accel_data[i].values())[0])
@@ -219,7 +217,7 @@ for packets in sniffed_channels:
             #lag = 1
             for lag in gtests:
                 if (gtests[lag][0]["ssr_ftest"][1] < 0.08):
-                    print(f"👀👀 Is spying! (lag{lag}, device: {s})")
+                    print(f"👀👀 Is spying! (lag{lag}, device: {device})")
                     
         except Exception as e:
             
