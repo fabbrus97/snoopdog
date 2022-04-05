@@ -10,7 +10,7 @@ import read_accel
 import time
 
 
-TIMEOUT = 15 #seconds to capture/record video
+TIMEOUT = 10 #seconds to capture/record video #TODO 50
 
 def sniff(interface):
     print ("Sniff started 👃🔴")
@@ -192,9 +192,9 @@ for packets in sniffed_channels:
     a_data = []
     packet_data = []
     for s in packets:
-        print(s) #DEBUG
+        print(packets[s]) #DEBUG
         i = 0
-        timestamp = s["time"]
+        timestamp = packets[s]["time"]
         j = 0 #index for accel data
         for a in accel_data:
             if accel_data.get(timestamp):
@@ -205,7 +205,7 @@ for packets in sniffed_channels:
         for i in range(j, TIMEOUT):
             a_data.append(list(accel_data[i].values())[0])
         
-        packet_data = s["bytes_per_seconds"]
+        packet_data = packets[s]["bytes_per_seconds"]
 
         d = {'frame': a_data, 'packet': packet_data}
         df = pd.DataFrame(data=d)
